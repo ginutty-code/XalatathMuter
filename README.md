@@ -15,7 +15,7 @@ A small World of Warcraft addon that mutes Xal'atath's whisper voice lines (and 
 
 **Option B — CurseForge**
 
-Install via the CurseForge app or website (if listed there), which will keep the addon updated automatically.
+Install via the CurseForge app or website.
 
 ## Usage
 
