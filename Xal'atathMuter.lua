@@ -39,8 +39,6 @@ local defaultBlocked = {
 6178508,
 }
 
-local enabled = true
-
 local function MuteAll()
     for id, _ in pairs(XalatathMuterDB.sounds) do
         MuteSoundFile(id)
@@ -55,20 +53,26 @@ end
 
 local function InitDB()
     if not XalatathMuterDB then
-        XalatathMuterDB = { sounds = {} }
+        XalatathMuterDB = { sounds = {}, removedDefaults = {}, enabled = true }
     end
     if not XalatathMuterDB.sounds then
         XalatathMuterDB.sounds = {}
     end
+    if not XalatathMuterDB.removedDefaults then
+        XalatathMuterDB.removedDefaults = {}
+    end
+    if XalatathMuterDB.enabled == nil then
+        XalatathMuterDB.enabled = true
+    end
     for _, id in ipairs(defaultBlocked) do
-        if not XalatathMuterDB.sounds[id] then
+        if not XalatathMuterDB.sounds[id] and not XalatathMuterDB.removedDefaults[id] then
             XalatathMuterDB.sounds[id] = true
         end
     end
 end
 
 local function ApplySounds()
-    if enabled then
+    if XalatathMuterDB.enabled then
         MuteAll()
     else
         UnmuteAll()
@@ -83,6 +87,7 @@ frame:SetScript("OnEvent", function(self, event, arg1)
     if event == "ADDON_LOADED" and arg1 == addonName then
         InitDB()
         print("Xal'atath Muter: Loaded (" .. #defaultBlocked .. " default sounds)")
+        self:UnregisterEvent("ADDON_LOADED")
     elseif event == "PLAYER_LOGIN" or event == "PLAYER_ENTERING_WORLD" then
         ApplySounds()
     end
@@ -97,12 +102,12 @@ SlashCmdList["XM"] = function(msg)
     arg = arg or ""
 
     if command == "on" then
-        enabled = true
+        XalatathMuterDB.enabled = true
         MuteAll()
         print("Xal'atath Muter: ON — sounds muted.")
 
     elseif command == "off" then
-        enabled = false
+        XalatathMuterDB.enabled = false
         UnmuteAll()
         print("Xal'atath Muter: OFF — sounds unmuted.")
 
@@ -110,7 +115,8 @@ SlashCmdList["XM"] = function(msg)
         local id = tonumber(arg)
         if id then
             XalatathMuterDB.sounds[id] = true
-            if enabled then MuteSoundFile(id) end
+            XalatathMuterDB.removedDefaults[id] = nil
+            if XalatathMuterDB.enabled then MuteSoundFile(id) end
             print("Xal'atath Muter: Added " .. id)
         else
             print("Xal'atath Muter: Invalid file data ID.")
@@ -120,6 +126,7 @@ SlashCmdList["XM"] = function(msg)
         local id = tonumber(arg)
         if id then
             XalatathMuterDB.sounds[id] = nil
+            XalatathMuterDB.removedDefaults[id] = true
             UnmuteSoundFile(id)
             print("Xal'atath Muter: Removed " .. id)
         else
@@ -137,6 +144,7 @@ SlashCmdList["XM"] = function(msg)
 
     elseif command == "reset" then
         XalatathMuterDB.sounds = {}
+        XalatathMuterDB.removedDefaults = {}
         for _, id in ipairs(defaultBlocked) do
             XalatathMuterDB.sounds[id] = true
         end
@@ -151,6 +159,6 @@ SlashCmdList["XM"] = function(msg)
         print("  /xm remove <id>  — remove a sound file data ID")
         print("  /xm list         — list all managed sounds")
         print("  /xm reset        — reset to defaults")
-        print("  Current state: " .. (enabled and "ON" or "OFF"))
+        print("  Current state: " .. (XalatathMuterDB.enabled and "ON" or "OFF"))
     end
 end
