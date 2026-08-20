@@ -1,4 +1,4 @@
-## Interface: 120007, 121000
+## Interface: 120100, 120105
 ## Title: Xal'atath Muter
 ## Notes: Mute specific sound files and manage a block list.
 ## Author: Ginutty
