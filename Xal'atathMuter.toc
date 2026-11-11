@@ -1,8 +1,8 @@
-## Interface: 120100, 120105
+## Interface: 120105, 120107
 ## Title: Xal'atath Muter
 ## Notes: Mute specific sound files and manage a block list.
 ## Author: Ginutty
-## Version: 1.0.3
+## Version: 1.0.4
 ## IconTexture: 458230
 ## SavedVariables: XalatathMuterDB
 
